@@ -1,0 +1,66 @@
+extends layout
+
+block content
+    div.text-center
+        div(class="form-signin")
+            div.text-center
+                p Welcome Dear #{username}!
+            - var buttonClass=['btn', 'btn-lg', 'btn-primary', 'btn-block'];
+            - var pClass=['d-none'];
+            button#btnFetchCurrent(class=buttonClass) Current
+            br
+            button#btnFetchNext(class=buttonClass) Next
+            br
+            input(type="text" name="reset" id="reset" class="form-control" placeholder="reset your current" required autoforce)
+            button#btnFetchReset(class=buttonClass) Reset
+            br
+            p#current  
+        
+        div
+        a(href='/logout') Log out
+
+    script.
+        document.getElementById("btnFetchCurrent").addEventListener("click", function(){
+            let url = '/v1/current';
+            buildReq(url, 'GET', 'cors', "", "current");
+        });
+
+        document.getElementById("btnFetchNext").addEventListener("click", function(){
+            let url = '/v1/next';
+            buildReq(url, 'GET', 'cors', "", "next");
+        });
+
+        document.getElementById("btnFetchReset").addEventListener("click", function(){
+            if(document.getElementById("reset").value == "")
+                return alert("Reset number could'nt be empty");
+            if(Number(document.getElementById("reset").value) < 0)
+                return alert("Reset number could'nt be negative");
+
+            let url = '/v1/current';
+            let resetCurrent = {current: document.getElementById("reset").value};
+            buildReq(url, 'PUT', 'cors', resetCurrent, "reset");
+        });
+
+        function buildReq(url, method, mode, body, action){
+            let reqDetails = {
+                    method: method,
+                    mode: mode,
+                    headers: {
+                        'Content-type': 'application/json'
+                    }
+                };
+
+            if(body != "")
+                reqDetails.body = JSON.stringify(body);
+
+            let req = new Request(url, reqDetails);
+            fetch(req).then(resp => resp.json()).then(data => {
+                if(action == "next")
+                    {alert("your next number is " + data + ", Current Updated");}
+                document.getElementById("current").innerHTML = "your current number is " + data;
+                }).catch(err => {
+                    console.error(err.message);
+            })
+        }
+
+        

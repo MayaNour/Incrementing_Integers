@@ -6,7 +6,7 @@ const {currentNumberValidation} = require('../validation');
 router.get('/current', verify, async (req, res) => {
     const user = await User.findById(req.user._id);
     const current_int = user.current;
-    res.send(current_int.toString());
+    return res.send(current_int.toString());
 });
 
 router.put('/current', verify, async (req, res) => {
@@ -20,13 +20,13 @@ router.put('/current', verify, async (req, res) => {
     user.current = req.body.current;
     const updatedUser = await user.save();
 
-    res.send('Current number has been updated to ' + updatedUser.current);
+    return res.send(updatedUser.current.toString());
 });
 
 router.get('/next', verify, async (req, res) => {
     const user = await User.findOneAndUpdate({ _id: req.user._id }, { $inc: { current: 1 }},{ returnOriginal: false});
     // const updatedUser = await user.save();
-    res.send(user.current.toString());
+    return res.send(user.current.toString());
 });
 
 module.exports = router;
